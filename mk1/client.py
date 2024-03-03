@@ -6,7 +6,9 @@ from utils.time_decorator import timing_decorator
 
 # URL and payload
 # set modal's url
-url = "https://albertoecf--mk1-chat-endpoint-dev.modal.run/generate"
+#todo Identify how to specify / alter or get this url.
+base_url = "https://albertoecf--mk1-chat-endpoint-dev.modal.run/"
+url = f"{base_url}generate"
 headers = {"Content-Type": "application/json"}
 data = {
     "text": "What is the difference between a llama and an alpaca?",

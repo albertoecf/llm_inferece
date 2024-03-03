@@ -1,38 +1,5 @@
 import modal
-
-from typing import List
-from pydantic import BaseModel
-
-
-class GenerationRequest(BaseModel):
-    text: str
-    max_tokens: int
-    eos_token_ids: List[int] = []
-    max_input_tokens: int = 0
-    num_samples: int = 1
-    stop: List[str] = []
-    temperature: float = 1.0
-    top_k: int = 50
-    top_p: float = 1.0
-    presence_penalty: float = 0.0
-    frequency_penalty: float = 0.0
-
-
-class GenerationResponseSample(BaseModel):
-    text: str
-    generated_tokens: int
-    finished: float
-    finish_reason: str
-
-
-class GenerationResponse(BaseModel):
-    created: float
-    finished: float
-    num_samples: int
-    prompt: str
-    prompt_tokens: int
-    responses: List[GenerationResponseSample]
-
+from models import GenerationRequest, GenerationResponse
 
 stub = modal.Stub(
     "mk1-endpoint-backend",
@@ -47,6 +14,11 @@ stub = modal.Stub(
 )
 @modal.asgi_app(label="mk1-chat-endpoint")
 def app():
+    """Creates a FastAPI application for text generation using MK1 Flywheel.
+
+    Returns:
+        fastapi.FastAPI: The FastAPI application for text generation.
+    """
     import modal
     import fastapi
     import fastapi.staticfiles
@@ -62,6 +34,11 @@ def app():
 
     @web_app.get("/health")
     async def health():
+        """Endpoint for health status of the generation model.
+
+        Returns:
+            fastapi.Response: The health status response.
+        """
         stats = await model.generate.get_current_stats.aio()
         if stats.num_total_runners == 0:
             status_code = fastapi.status.HTTP_503_SERVICE_UNAVAILABLE
@@ -77,6 +54,11 @@ def app():
 
     @web_app.get("/stats")
     async def stats():
+        """Endpoint for retrieving statistics of the generation model.
+
+        Returns:
+            dict: The statistics of the generation model.
+        """
         stats = await model.generate.get_current_stats.aio()
         stats = {
             "backlog": stats.backlog,
@@ -86,6 +68,14 @@ def app():
 
     @web_app.post("/generate")
     async def generate(request: fastapi.Request) -> fastapi.Response:
+        """Endpoint for generating text based on the request payload.
+
+        Args:
+            request (fastapi.Request): The request containing generation parameters.
+
+        Returns:
+            fastapi.Response: The response containing generated text.
+        """
         content_type = request.headers.get("Content-Type")
         if content_type != "application/json":
             return fastapi.Response(
@@ -100,4 +90,3 @@ def app():
         return GenerationResponse(**response)
 
     return web_app
-
