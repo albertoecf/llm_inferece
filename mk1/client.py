@@ -6,6 +6,7 @@ from utils.time_decorator import timing_decorator
 
 # URL and payload
 # set modal's url
+#todo Identify how to specify / alter or get this url.
 url = "https://albertoecf--mk1-chat-endpoint-dev.modal.run/generate"
 headers = {"Content-Type": "application/json"}
 data = {

@@ -33,3 +33,6 @@ The script includes a decorator to calculate the execution time of requests. To 
 `time_decorator.py` defines a decorator function to calculate the execution time of a function based on MK1 response. This decorator is used in the `client.py` script to measure the time taken for the HTTP POST request.
 
 
+
+## Next Steps
+- Investigate https://modal.com/docs/guide/trigger-deployed-functions 
