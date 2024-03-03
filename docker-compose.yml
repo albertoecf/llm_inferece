@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  modal_endpoint:
+    build: .
+    command: sh -c "cd MK1 && modal serve modal_endpoint.py"
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+
+  client:
+    build: .
+    command: sh -c "cd MK1 && poetry run python client.py"
+    depends_on:
+      - modal_endpoint
+    volumes:
+      - .:/app
+    tty: true  # Enable TTY for the client service
