@@ -17,7 +17,7 @@ We will define some variables to configure our execution
 
 MODEL_TO_USE:  [Mixtral 8x7B Instruct](https://blog.unrealspeech.com/mixtral-8x7b-instruct-comprehensive-guide/#:~:text=1%3F-,Mixtral%2D8x7B%2DInstruct%2Dv0.,produce%20high%2Dquality%20text%20outputs.) generative model designed to produce high-quality text outputs 
 [IMAGE_TO_USE](https://modal.com/docs/reference/modal.Image): Utilize the Debian Slim container image, which serves as the foundation for running functions smoothly
-GPU_CONFIG: Configure the system with [Nvidia A10G]([pricing](https://modal.com/pricing)) for accelerated performance.
+GPU_CONFIG: Configure the system with [Nvidia A10G](https://modal.com/pricing) for accelerated performance.
 
 Lets define them 
 
@@ -34,12 +34,6 @@ GPU_CONFIG = modal.gpu.A10G()
 The GenerationRequest class defines parameters that can be adjusted for the request. It receives a text string as input and allows setting various properties such as max_tokens, temperature, etc.
 
 ```
-import modal
-
-from typing import List
-from pydantic import BaseModel
-
-
 class GenerationRequest(BaseModel):
     text: str
     max_tokens: int
@@ -80,7 +74,7 @@ class GenerationResponse(BaseModel):
 ## Implement FastAPI
 
 We start by initializing the FastAPI application 
-and defining the necessary routes: for health status, statistics, and text generation. The `/generate` endpoint processes requests for text generation based on the provided payload.
+and defining the necessary routes: for health status, statistics, and text generation. The `/generate` endpoint processes requests for text generation based on the provided payload. Check source code for /heatlh and /stats
 
 
 The following code simply creates a Modal application called "mk1-endpoint-backend" using a specified image. [Read more](https://modal.com/docs/reference/modal.Stub#modalstub)
