@@ -1,9 +1,14 @@
 import modal
 from models import GenerationRequest, GenerationResponse
 
+MODEL_TO_USE = "mk1-flywheel-latest-mistral-7b-instruct"
+IMAGE_TO_USE = modal.Image.debian_slim()
+GPU_CONFIG = modal.gpu.A10G()
+
+
 stub = modal.Stub(
     "mk1-endpoint-backend",
-    image=modal.Image.debian_slim(),
+    image=IMAGE_TO_USE,
 )
 
 
@@ -24,10 +29,11 @@ def app():
     import fastapi.staticfiles
 
     web_app = fastapi.FastAPI()
+    #todo extraer model 
     Model = modal.Cls.lookup(
-        "mk1-flywheel-latest-mistral-7b-instruct", "Model", workspace="mk1"
+        MODEL_TO_USE, "Model", workspace="mk1"
     ).with_options(
-        gpu=modal.gpu.A10G(),
+        gpu=GPU_CONFIG,
         timeout=600,
     )
     model = Model()
