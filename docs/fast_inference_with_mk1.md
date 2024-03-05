@@ -1,6 +1,13 @@
 ## Intro 
 [MK1](https://mk1.ai/blog/flywheel-launch?_gl=1*1r6qzwz*_ga*NDc3OTE1NjY4LjE3MDkyMzUxMzc.*_ga_G1XWZE50S3*MTcwOTQ2ODYyMy40LjEuMTcwOTQ2OTMxOS4wLjAuMA..) offers a powerful solution for high-performance inference with effortless setup. In this guide, we'll explore how to leverage [MK1 - Flywheel](https://mk1.ai/blog/flywheel-launch?_gl=1*1r6qzwz*_ga*NDc3OTE1NjY4LjE3MDkyMzUxMzc.*_ga_G1XWZE50S3*MTcwOTQ2ODYyMy40LjEuMTcwOTQ2OTMxOS4wLjAuMA..) for seamless inference using the [Mixtral 8x7B Instruct](https://blog.unrealspeech.com/mixtral-8x7b-instruct-comprehensive-guide/#:~:text=1%3F-,Mixtral%2D8x7B%2DInstruct%2Dv0.,produce%20high%2Dquality%20text%20outputs.) model.
 
+We will cover the following steps 
+* Setup
+* Models
+* Endpoint
+* Deploy on modal
+* Client example
+
 
 
 ### Setup 
@@ -13,13 +20,13 @@ from pydantic import BaseModel
 
 ```
 
-We will define some variables to configure our execution
+We will define the following variables to configure our execution
 
-MODEL_TO_USE:  [Mixtral 8x7B Instruct](https://blog.unrealspeech.com/mixtral-8x7b-instruct-comprehensive-guide/#:~:text=1%3F-,Mixtral%2D8x7B%2DInstruct%2Dv0.,produce%20high%2Dquality%20text%20outputs.) generative model designed to produce high-quality text outputs 
-[IMAGE_TO_USE](https://modal.com/docs/reference/modal.Image): Utilize the Debian Slim container image, which serves as the foundation for running functions smoothly
-GPU_CONFIG: Configure the system with [Nvidia A10G](https://modal.com/pricing) for accelerated performance.
+* MODEL_TO_USE:  [Mixtral 8x7B Instruct](https://blog.unrealspeech.com/mixtral-8x7b-instruct-comprehensive-guide/#:~:text=1%3F-,Mixtral%2D8x7B%2DInstruct%2Dv0.,produce%20high%2Dquality%20text%20outputs.) generative model designed to produce high-quality text outputs 
+* [IMAGE_TO_USE](https://modal.com/docs/reference/modal.Image): Utilize the Debian Slim container image, which serves as the foundation for running functions smoothly
+* GPU_CONFIG: Configure the system with [Nvidia A10G](https://modal.com/pricing) for accelerated performance.
 
-Lets define them 
+We declare them in a python file 
 
 ```
 MODEL_TO_USE ="mk1-flywheel-latest-mistral-7b-instruct"
@@ -74,10 +81,10 @@ class GenerationResponse(BaseModel):
 ## Implement FastAPI
 
 We start by initializing the FastAPI application 
-and defining the necessary routes: for health status, statistics, and text generation. The `/generate` endpoint processes requests for text generation based on the provided payload. Check source code for /heatlh and /stats
+and defining the necessary routes: for health status, statistics, and text generation. The `/generate` endpoint processes requests for text generation based on the provided payload. Check source code for `/heatlh` and `/stats`.
 
 
-The following code simply creates a Modal application called "mk1-endpoint-backend" using a specified image. [Read more](https://modal.com/docs/reference/modal.Stub#modalstub)
+The following code creates a Modal application called "mk1-endpoint-backend" using a specified image. [Read more](https://modal.com/docs/reference/modal.Stub#modalstub)
 
 ````
 stub = modal.Stub(
@@ -156,7 +163,7 @@ For deploying our application and creating a persistent web endpoint in the clou
 modal deploy
 ```
 
-## Use your brand new endpoint
+## Use our brand new endpoint
 
 We will create some python code to interact with our new endpoint as some client app could do it
 
@@ -183,7 +190,7 @@ data = {
 ````
 
 
-Replace base_url with your actual url (check the ouput of modal deploy) 
+🚧 Replace base_url with your actual url (check the ouput of `modal serve views.py`) (you can also fin this value in modal panel, see bonus section)
 
 Finally execute the request
 
@@ -208,7 +215,23 @@ except requests.exceptions.RequestException as e:
     print(f"An error occurred: {e}")
 ````
 
-After some seconds you will recive the answer, first run will take a couple of extra seconds
+After some seconds you will recive the answer. Note, that the first request might take a few seconds to account for the coldstart, but subsequent calls will be faster.
+
+## Bonus
+
+1. Instead of creating a client file, we could simply curl to the endpoint to engage with the model (remember to replace the url)
+    ````
+    curl -X "POST" "https://albertoecf--mk1-chat-endpoint-dev.modal.run/generate" -H 'Content-Type: application/json' -d '{
+    "text": "What is the difference between a llama and an alpaca?",
+    "max_tokens": 512,
+    "eos_token_ids": [1, 2],
+    "temperature": 0.8,
+    "top_k": 50,
+    "top_p": 1.0
+    }'
+    ````
+2. Check app & deployment stats on `modal.com/your_github_user_name/apps`. Here you will find the billing period, activity, calls and more.
+   ![Alt text](../static_files/modal_app_info.png)
 
 ### Todo
 * Deploy and invoke the model
